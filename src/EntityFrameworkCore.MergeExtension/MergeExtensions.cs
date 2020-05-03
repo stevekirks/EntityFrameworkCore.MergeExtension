@@ -72,7 +72,10 @@ namespace EntityFrameworkCore.MergeExtension
             if (entityType == null)
                 throw new InvalidOperationException($"DbContext does not contain Entity Type {type.Name}");
 
-            var primaryKeys = entityType.FindPrimaryKey().Properties.Select(a => a.Name).ToList();
+            var primaryKeys = entityType.FindPrimaryKey()?.Properties.Select(a => a.Name).ToList();
+            if (primaryKeys == null)
+                throw new InvalidOperationException($"Entity Type {type.Name} must have a key");
+
             var properties = entityType.GetProperties().Select(a => a.Name);
             var propertiesExcludingPrimaryKeys = properties.Where(p => !primaryKeys.Contains(p));
 
