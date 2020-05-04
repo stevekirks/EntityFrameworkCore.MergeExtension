@@ -1,6 +1,6 @@
 name: ci
 env:
-  build_version: 0.1.${{github.run_number}}
+  build_version: 1.0.${{github.run_number}}
 
 on:
   push:
