@@ -1,4 +1,6 @@
 name: .NET Core
+env:
+  build_version: 0.0.${{ GITHUB_RUN_ID }}
 
 on:
   push:
@@ -29,3 +31,5 @@ jobs:
         dotnet build tests/**/*.csproj --configuration Release --no-restore
     - name: Test
       run: dotnet test tests/**/*.csproj --no-restore --verbosity normal
+    - name: Pack
+      run: dotnet pack src/EntityFrameworkCore.MergeExtension/EntityFrameworkCore.MergeExtension.csproj -o packaged -c Release -p:PackageVersion=$build_version
