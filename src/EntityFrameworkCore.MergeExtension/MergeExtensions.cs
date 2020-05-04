@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 [assembly: InternalsVisibleTo("EntityFrameworkCore.MergeExtension.Tests")]
 namespace EntityFrameworkCore.MergeExtension
 {
+    /// <summary>
+    /// Merge Extensions
+    /// </summary>
     public static class MergeExtensions
     {
         /// <summary>
@@ -17,6 +20,8 @@ namespace EntityFrameworkCore.MergeExtension
         /// </summary>
         public static void MergeInto<TSource>(this DbContext dbContext, string targetTable)
         {
+            if (dbContext == null)
+                throw new ArgumentNullException(nameof(dbContext), "DbContext must not be null");
             var sourceTable = dbContext.GetTableName<TSource>();
             var rawSql = dbContext.GetRawSqlMerge<TSource>(sourceTable, targetTable);
             dbContext.Database.ExecuteSqlRaw(rawSql);
@@ -28,9 +33,11 @@ namespace EntityFrameworkCore.MergeExtension
         /// </summary>
         public static async Task MergeIntoAsync<TSource>(this DbContext dbContext, string targetTable)
         {
+            if (dbContext == null)
+                throw new ArgumentNullException(nameof(dbContext), "DbContext must not be null");
             var sourceTable = dbContext.GetTableName<TSource>();
             var rawSql = dbContext.GetRawSqlMerge<TSource>(sourceTable, targetTable);
-            await dbContext.Database.ExecuteSqlRawAsync(rawSql);
+            await dbContext.Database.ExecuteSqlRawAsync(rawSql).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -39,6 +46,8 @@ namespace EntityFrameworkCore.MergeExtension
         /// </summary>
         public static void MergeFrom<TTarget>(this DbContext dbContext, string sourceTable)
         {
+            if (dbContext == null)
+                throw new ArgumentNullException(nameof(dbContext), "DbContext must not be null");
             var targetTable = dbContext.GetTableName<TTarget>();
             var rawSql = dbContext.GetRawSqlMerge<TTarget>(sourceTable, targetTable);
             dbContext.Database.ExecuteSqlRaw(rawSql);
@@ -50,19 +59,31 @@ namespace EntityFrameworkCore.MergeExtension
         /// </summary>
         public static async Task MergeFromAsync<TTarget>(this DbContext dbContext, string sourceTable)
         {
+            if (dbContext == null)
+                throw new ArgumentNullException(nameof(dbContext), "DbContext must not be null");
             var targetTable = dbContext.GetTableName<TTarget>();
             var rawSql = dbContext.GetRawSqlMerge<TTarget>(sourceTable, targetTable);
-            await dbContext.Database.ExecuteSqlRawAsync(rawSql);
+            await dbContext.Database.ExecuteSqlRawAsync(rawSql).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Truncate a table
+        /// </summary>
         public static void Truncate<T>(this DbContext dbContext)
         {
+            if (dbContext == null)
+                throw new ArgumentNullException(nameof(dbContext), "DbContext must not be null");
             dbContext.Database.ExecuteSqlRaw(dbContext.GetTruncateSqlRaw<T>());
         }
 
+        /// <summary>
+        /// Truncate a table
+        /// </summary>
         public static async Task TruncateAsync<T>(this DbContext dbContext)
         {
-            await dbContext.Database.ExecuteSqlRawAsync(dbContext.GetTruncateSqlRaw<T>());
+            if (dbContext == null)
+                throw new ArgumentNullException(nameof(dbContext), "DbContext must not be null");
+            await dbContext.Database.ExecuteSqlRawAsync(dbContext.GetTruncateSqlRaw<T>()).ConfigureAwait(false);
         }
 
         internal static string GetRawSqlMerge<T>(this DbContext dbContext, string sourceTable, string targetTable)
