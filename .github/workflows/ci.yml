@@ -1,6 +1,6 @@
-name: .NET Core
+name: ci
 env:
-  build_version: 0.0.${{ GITHUB_RUN_ID }}
+  build_version: 0.1.${{github.run_number}}
 
 on:
   push:
@@ -33,3 +33,12 @@ jobs:
       run: dotnet test tests/**/*.csproj --no-restore --verbosity normal
     - name: Pack
       run: dotnet pack src/EntityFrameworkCore.MergeExtension/EntityFrameworkCore.MergeExtension.csproj -o packaged -c Release -p:PackageVersion=$build_version
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: packaged
+        path: packaged
+    - name: Push
+      env:
+        nuget_api_key: ${{ secrets.nuget_api_key }}
+      run: dotnet nuget push packaged/EntityFrameworkCore.MergeExtension.$build_version.nupkg -k $nuget_api_key -s https://api.nuget.org/v3/index.json
